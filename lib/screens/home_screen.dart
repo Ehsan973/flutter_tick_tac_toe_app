@@ -1,9 +1,16 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  bool isTurnO = true;
+
+  var xOrOList = ['', '', '', '', '', '', '', '', ''];
 
   @override
   Widget build(BuildContext context) {
@@ -29,16 +36,20 @@ class HomeScreen extends StatelessWidget {
                 height: 40,
               ),
               _getGridView(),
-              Text(
-                'Turn O',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              _getTurn(),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _getTurn() {
+    return Text(
+      isTurnO ? 'turn O' : 'turn X',
+      style: TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.bold,
       ),
     );
   }
@@ -63,6 +74,16 @@ class HomeScreen extends StatelessWidget {
                   color: Colors.grey,
                 ),
               ),
+              child: Center(
+                child: Text(
+                  '${xOrOList[index]}',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: xOrOList[index] == 'X' ? Colors.white : Colors.red,
+                    fontSize: 70,
+                  ),
+                ),
+              ),
             ),
           );
         },
@@ -71,7 +92,19 @@ class HomeScreen extends StatelessWidget {
   }
 
   void tapped(int index) {
-    print('$index');
+    if (xOrOList[index] != '') return;
+
+    if (isTurnO) {
+      setState(() {
+        xOrOList[index] = 'O';
+        isTurnO = !isTurnO;
+      });
+    } else {
+      setState(() {
+        xOrOList[index] = 'X';
+        isTurnO = !isTurnO;
+      });
+    }
   }
 
   Widget _getScoreBoard() {
