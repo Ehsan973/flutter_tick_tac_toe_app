@@ -11,6 +11,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isTurnO = true;
 
   var xOrOList = ['', '', '', '', '', '', '', '', ''];
+  int filledBoxes = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +24,14 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text(
           'TicTacToe',
         ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              reset_game();
+            },
+            icon: Icon(Icons.refresh),
+          ),
+        ],
       ),
       body: SafeArea(
         child: Center(
@@ -91,20 +100,83 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void reset_game() {
+    setState(() {
+      for (var i = 0; i < xOrOList.length; i++) {
+        xOrOList[i] = '';
+      }
+    });
+    filledBoxes = 0;
+  }
+
   void tapped(int index) {
     if (xOrOList[index] != '') return;
 
     if (isTurnO) {
       setState(() {
         xOrOList[index] = 'O';
+        filledBoxes++;
         isTurnO = !isTurnO;
       });
     } else {
       setState(() {
         xOrOList[index] = 'X';
+        filledBoxes++;
         isTurnO = !isTurnO;
       });
     }
+  }
+
+  void checkWinner() {
+    //check rows
+    if (xOrOList[0] == xOrOList[1] &&
+        xOrOList[0] == xOrOList[2] &&
+        xOrOList[0] != '') {
+      return;
+    }
+
+    if (xOrOList[3] == xOrOList[4] &&
+        xOrOList[3] == xOrOList[5] &&
+        xOrOList[3] != '') {
+      return;
+    }
+    if (xOrOList[6] == xOrOList[7] &&
+        xOrOList[6] == xOrOList[8] &&
+        xOrOList[6] != '') {
+      return;
+    }
+
+    //check columns
+    if (xOrOList[0] == xOrOList[3] &&
+        xOrOList[0] == xOrOList[6] &&
+        xOrOList[0] != '') {
+      return;
+    }
+    if (xOrOList[1] == xOrOList[4] &&
+        xOrOList[1] == xOrOList[7] &&
+        xOrOList[1] != '') {
+      return;
+    }
+    if (xOrOList[2] == xOrOList[5] &&
+        xOrOList[2] == xOrOList[8] &&
+        xOrOList[2] != '') {
+      return;
+    }
+
+    //check diagons
+    if (xOrOList[0] == xOrOList[4] &&
+        xOrOList[0] == xOrOList[8] &&
+        xOrOList[0] != '') {
+      return;
+    }
+    if (xOrOList[2] == xOrOList[4] &&
+        xOrOList[2] == xOrOList[6] &&
+        xOrOList[2] != '') {
+      return;
+    }
+
+    //equality check
+    if (filledBoxes == 9) {}
   }
 
   Widget _getScoreBoard() {
