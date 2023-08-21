@@ -9,6 +9,11 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool isTurnO = true;
+  int xScore = 0;
+  int oScore = 0;
+
+  bool gameHasResult = false;
+  String winnerTitle = '';
 
   var xOrOList = ['', '', '', '', '', '', '', '', ''];
   int filledBoxes = 0;
@@ -27,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             onPressed: () {
-              reset_game();
+              _resetGame();
             },
             icon: Icon(Icons.refresh),
           ),
@@ -42,11 +47,43 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               _getScoreBoard(),
               SizedBox(
-                height: 40,
+                height: gameHasResult ? 25 : 40,
+              ),
+              _getResultButton(),
+              SizedBox(
+                height: 10,
               ),
               _getGridView(),
               _getTurn(),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _getResultButton() {
+    return Visibility(
+      visible: gameHasResult,
+      child: OutlinedButton(
+        onPressed: () {
+          setState(() {
+            gameHasResult = false;
+            _clearGame();
+          });
+        },
+        child: Text(
+          '$winnerTitle, play again!',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        style: OutlinedButton.styleFrom(
+          foregroundColor: Colors.white,
+          side: BorderSide(
+            color: Colors.white,
+            width: 2,
           ),
         ),
       ),
@@ -73,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
         itemBuilder: (BuildContext context, int index) {
           return GestureDetector(
             onTap: () {
-              tapped(index);
+              _tapped(index);
             },
             child: Container(
               height: 100,
@@ -100,16 +137,27 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void reset_game() {
+  void _resetGame() {
+    _clearGame();
+    setState(() {
+      xScore = 0;
+      oScore = 0;
+      gameHasResult = false;
+    });
+  }
+
+  void _clearGame() {
     setState(() {
       for (var i = 0; i < xOrOList.length; i++) {
         xOrOList[i] = '';
       }
+      isTurnO = true;
     });
     filledBoxes = 0;
   }
 
-  void tapped(int index) {
+  void _tapped(int index) {
+    if (gameHasResult) return;
     if (xOrOList[index] != '') return;
 
     if (isTurnO) {
@@ -125,24 +173,30 @@ class _HomeScreenState extends State<HomeScreen> {
         isTurnO = !isTurnO;
       });
     }
+
+    _checkWinner();
   }
 
-  void checkWinner() {
+  void _checkWinner() {
     //check rows
     if (xOrOList[0] == xOrOList[1] &&
         xOrOList[0] == xOrOList[2] &&
         xOrOList[0] != '') {
+      _setResult(xOrOList[0]);
       return;
     }
 
     if (xOrOList[3] == xOrOList[4] &&
         xOrOList[3] == xOrOList[5] &&
         xOrOList[3] != '') {
+      _setResult(xOrOList[3]);
       return;
     }
     if (xOrOList[6] == xOrOList[7] &&
         xOrOList[6] == xOrOList[8] &&
         xOrOList[6] != '') {
+      _setResult(xOrOList[6]);
+
       return;
     }
 
@@ -150,16 +204,22 @@ class _HomeScreenState extends State<HomeScreen> {
     if (xOrOList[0] == xOrOList[3] &&
         xOrOList[0] == xOrOList[6] &&
         xOrOList[0] != '') {
+      _setResult(xOrOList[0]);
+
       return;
     }
     if (xOrOList[1] == xOrOList[4] &&
         xOrOList[1] == xOrOList[7] &&
         xOrOList[1] != '') {
+      _setResult(xOrOList[1]);
+
       return;
     }
     if (xOrOList[2] == xOrOList[5] &&
         xOrOList[2] == xOrOList[8] &&
         xOrOList[2] != '') {
+      _setResult(xOrOList[2]);
+
       return;
     }
 
@@ -167,16 +227,38 @@ class _HomeScreenState extends State<HomeScreen> {
     if (xOrOList[0] == xOrOList[4] &&
         xOrOList[0] == xOrOList[8] &&
         xOrOList[0] != '') {
+      _setResult(xOrOList[0]);
+
       return;
     }
     if (xOrOList[2] == xOrOList[4] &&
         xOrOList[2] == xOrOList[6] &&
         xOrOList[2] != '') {
+      _setResult(xOrOList[2]);
       return;
     }
 
     //equality check
-    if (filledBoxes == 9) {}
+    if (filledBoxes == 9) {
+      _setResult('');
+    }
+  }
+
+  void _setResult(String winner) {
+    setState(() {
+      gameHasResult = true;
+      if (winner == 'O') {
+        winnerTitle = 'winner is O';
+        oScore++;
+      } else if (winner == 'X') {
+        winnerTitle = 'winner is X';
+        xScore++;
+      } else {
+        winnerTitle = 'Draw';
+        oScore++;
+        xScore++;
+      }
+    });
   }
 
   Widget _getScoreBoard() {
@@ -198,7 +280,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Padding(
               padding: EdgeInsets.all(8),
               child: Text(
-                '0',
+                '$oScore',
                 style: TextStyle(
                   fontSize: 25,
                   color: Colors.white,
@@ -222,7 +304,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Padding(
               padding: EdgeInsets.all(8),
               child: Text(
-                '0',
+                '$xScore',
                 style: TextStyle(
                   fontSize: 25,
                   color: Colors.white,
